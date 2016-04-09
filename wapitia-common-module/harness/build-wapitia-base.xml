@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--+ ====================================================================== 
+    |  WapitiaBuildBase                                                       
+    |  Ant file to clean, build, distribute Wapitia projects                                                   
+    |  @author Corey Morgan                                                 
+    + ====================================================================== -->
+<project name="WapitiaBuildBase" default="init">
+    
+    <property environment="env"/>
+    
+    <taskdef  
+        resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+        classpath="${env.COTS}/checkstyle-6.17-all.jar"/>
+
+    <target name="all" depends="init,checkstyle,clean,build,dist,javadoc,zip.source" 
+        description="Clean, Build and document all">
+    </target>
+	
+	<target name="clean" depends="init">
+		<delete dir="${project.bin.dir}" />
+        <delete dir="${project.build.dir}" />
+        <delete dir="${javadoc.dir}" />
+	</target>
+    
+    <target name="build" depends="init">
+        <mkdir dir="${main.classes.dir}" />
+        <javac srcdir="${main.source.dir}" destdir="${main.classes.dir}" includeantruntime="false">
+            <classpath refid="project.main.class.path" />
+        </javac>
+        <mkdir dir="${test.classes.dir}" />
+    	<javac srcdir="${test.source.dir}" destdir="${test.classes.dir}" includeantruntime="false">
+            <classpath refid="project.test.class.path" />
+       	</javac>
+    </target>
+	
+	<target name="dist" depends="init,build,javadoc">
+        <mkdir dir="${project.dist.dir}" />
+		<jar destfile="${project.dist.dir}/${project.artifact.id}-${project.artifact.version}.jar" 
+			index="true" basedir="${main.classes.dir}" >
+		</jar>
+        <jar destfile="${project.dist.dir}/Test-${project.artifact.id}-${project.artifact.version}.jar" 
+            index="true" basedir="${test.classes.dir}">
+        </jar>
+        <zip basedir="${main.source.dir}" destfile="${project.dist.dir}/sources.jar" />
+        <zip basedir="${javadoc.dir}" destfile="${project.dist.dir}/javadoc.jar" />
+	</target>
+	
+	<target name="eclipse.project.files.to.repo" depends="init" 
+		  description="move eclipse project files to repo build directory">
+		<mkdir dir="${repo.project.base}/build/eclipse" />
+		<copy file="${project.dir}/.classpath" todir="${repo.project.base}/build/eclipse" />
+        <copy file="${project.dir}/.project" todir="${repo.project.base}/build/eclipse" />
+	</target>
+	
+    <target name="checkstyle" depends="init" description="checkstyle-6.17 on the source">
+        <!-- <mkdir dir="${project.build.dir}" /> -->
+        <checkstyle config="${checkstyle.rules}">
+          <fileset dir="${source.dir}" includes="**/*.java"/>
+          <formatter type="plain" useFile="false" />
+          <!--    <formatter type="plain" toFile="build/checkstyle_errors.txt" /> -->
+          <!--    <formatter type="xml" toFile="build/checkstyle_errors.xml" />  -->
+        </checkstyle>        
+    </target>
+
+    <target name="javadoc" depends="init" 
+        description="Document the source code">
+        
+        <mkdir dir="${javadoc.dir}"/>
+        
+        <javadoc defaultexcludes="yes"
+                   destdir="${javadoc.dir}"
+                   access="protected" 
+                   author="true"
+                   version="true"
+                   use="true"
+        	       overview="${javadoc.overview.files}" 
+                   windowtitle="${project.name} API Documentation">
+            <sourcepath path="${main.source.dir}" />
+            <doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; 2016 ${company.name}</i>]]></bottom>
+            <tag name="todo" scope="all" description="To do:"/>
+            <link href="http://docs.oracle.com/javase/8/docs/api/" />
+            <link href="http://junit.org/junit4/javadoc/latest/"/>
+            <classpath  >
+                  <fileset dir="${cots.dir}">
+                    <include name="junit4/junit.jar"/>
+                  </fileset>
+            </classpath>
+          </javadoc>        
+        
+    </target>
+    
+    <target name="zip.source" depends="init" 
+        description="Zip the source code">
+        <zip basedir="${basedir}" destfile="${zip.source.filepath}"
+            includes="src/**,build.xml,.project,.classpath"
+            />
+    </target>
+
+	<target name="test" depends="init,build">
+		<junit printsummary="yes" haltonfailure="yes">
+		  <classpath>
+		    <pathelement location="${main.classes.dir}"/>
+            <pathelement location="${test.classes.dir}"/>
+            <fileset dir="${cots.dir}">
+              <include name="junit4/junit.jar"/>
+              <include name="ant-junit4.jar"/>
+            </fileset>
+		  </classpath>
+
+		  <formatter type="plain"/>
+
+		  <test name="${test.suite.class}" haltonfailure="no" outfile="result">
+		    <formatter type="plain" usefile="no" />
+		  </test>
+<!--
+		  <batchtest fork="yes" todir="${reports.tests}">
+		    <fileset dir="${src.tests}">
+		      <include name="**/*Test*.java"/>
+		      <exclude name="**/AllTests.java"/>
+		    </fileset>
+		  </batchtest>
+		  -->
+		</junit>
+	</target>
+		
+    <target name="init">
+        <tstamp />
+        <property file="build.properties" />
+
+        <property name="workspace.dir" value="${env.HOME}/workspace" />
+    	<property name="company.name" value="Wapitia" />        
+        <property name="company.home.ref" value="wapitia.com" />        
+        <property name="project.name" value="${ant.project.name}"/>
+		<property name="project.dir" value="${workspace.dir}/${project.name}" />
+    	<property name="project.artifact.id" value="${artifact.id}" />
+        <property name="project.artifact.version" value="${artifact.version}" />
+        <property name="eclipse.project.dir" value="${project.dir}" />
+    	<!--
+        <property name="common.project.dir" value="${workspace.dir}/WapitiaCommonTest" />
+        -->
+        <property name="common.project.dir" value="${env.HOME}/git/wapitia-common-test/wapitia-common-module" />
+    	
+        <!--
+        <property name="source.dir" value="${project.dir}/src"/>
+        -->
+        <property name="repo.project.base" value="${env.HOME}/git/${repo.base.name}"/>
+        <property name="repo.module.base" value="${repo.project.name/${module.name}"/>
+        <property name="docs.dir" value="${repo.module.base}/docs"/>
+        <property name="source.dir" value="${repo.module.base}/src"/>
+        <property name="main.source.dir" value="${source.dir}/main"/>
+        <property name="test.source.dir" value="${source.dir}/test"/>
+        <property name="module.source.dir" value="${source.dir}/module"/>
+        <property name="javadoc.dir" value="${docs.dir}/javadoc"/>
+        <property name="javadoc.overview.files" value="${docs.dir}/api/overview.html"/>
+
+        <property name="cots.dir" value="${env.COTS}" />
+        <property name="test.harness.dir" value="${common.project.dir}/harness" />
+        <property name="checkstyle.rules" value="${test.harness.dir}/wapitia-checkstyle.xml" />
+        <property name="project.bin.dir" value="${project.dir}/bin" />
+        <property name="main.classes.dir" value="${project.bin.dir}/classes"/>
+        <property name="test.classes.dir" value="${project.bin.dir}/testclasses"/>
+        <property name="project.build.dir" value="${project.dir}/build" />
+        <property name="project.dist.dir" value="${project.dir}/dist" />
+        <property name="project.group.id" value="com.wapitia" />
+        <property name="project.version" value="0.1.0" />
+        <property name="zip.source.filepath" value="${project.dir}/${project.name}.${DSTAMP}.zip"/>
+    </target>
+
+</project>

@@ -1,7 +1,15 @@
+# Repository artifacts to ignore
+# class files and other built artifacts
 *.class
+bin/
+dist/
+
+# generated documentation
+javadoc/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
+*.swp
 
 # Package Files #
 *.jar
