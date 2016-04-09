@@ -126,8 +126,7 @@
 		
     <target name="init">
         <tstamp />
-        <property file="build.properties" />
-
+        <property file="build.properties"  />
         <property name="workspace.dir" value="${env.HOME}/workspace" />
     	<property name="company.name" value="Wapitia" />        
         <property name="company.home.ref" value="wapitia.com" />        
@@ -136,24 +135,13 @@
     	<property name="project.artifact.id" value="${artifact.id}" />
         <property name="project.artifact.version" value="${artifact.version}" />
         <property name="eclipse.project.dir" value="${project.dir}" />
-    	<!--
-        <property name="common.project.dir" value="${workspace.dir}/WapitiaCommonTest" />
-        -->
         <property name="common.project.dir" value="${env.HOME}/git/wapitia-common-test/wapitia-common-module" />
-    	
-        <!--
-        <property name="source.dir" value="${project.dir}/src"/>
-        -->
         <property name="repo.project.base" value="${env.HOME}/git/${repo.base.name}"/>
-        <property name="repo.module.base" value="${repo.project.name/${module.name}"/>
+        <property name="repo.module.base" value="${repo.project.base}/${module.name}"/>
         <property name="docs.dir" value="${repo.module.base}/docs"/>
         <property name="source.dir" value="${repo.module.base}/src"/>
         <property name="main.source.dir" value="${source.dir}/main"/>
         <property name="test.source.dir" value="${source.dir}/test"/>
-        <property name="module.source.dir" value="${source.dir}/module"/>
-        <property name="javadoc.dir" value="${docs.dir}/javadoc"/>
-        <property name="javadoc.overview.files" value="${docs.dir}/api/overview.html"/>
-
         <property name="cots.dir" value="${env.COTS}" />
         <property name="test.harness.dir" value="${common.project.dir}/harness" />
         <property name="checkstyle.rules" value="${test.harness.dir}/wapitia-checkstyle.xml" />
@@ -162,9 +150,24 @@
         <property name="test.classes.dir" value="${project.bin.dir}/testclasses"/>
         <property name="project.build.dir" value="${project.dir}/build" />
         <property name="project.dist.dir" value="${project.dir}/dist" />
-        <property name="project.group.id" value="com.wapitia" />
-        <property name="project.version" value="0.1.0" />
         <property name="zip.source.filepath" value="${project.dir}/${project.name}.${DSTAMP}.zip"/>
-    </target>
+        <property name="module.source.dir" value="${source.dir}/module"/>
+        <property name="javadoc.dir" value="${docs.dir}/javadoc"/>
+        <property name="javadoc.overview.files" value="${docs.dir}/api/overview.html"/>
+        <echo message="repo.project.base = ${repo.project.base}" />
+        <echo message="docs.dir          = ${docs.dir}" />
+        <echo message="source.dir        = ${source.dir}" />
+        <echo message="main.source.dir   = ${main.source.dir}" />
+        <echo message="test.source.dir   = ${test.source.dir}" />
+        <echo message="project.name      = ${project.name}" />
+        <echo message="project.dir       = ${project.dir}" />
+        <echo message="project.artifact.id        = ${project.artifact.id}" />
+        <echo message="project.artifact.version   = ${project.artifact.version}" />
+        <echo message="project.bin.dir   = ${project.bin.dir}" />
+        <echo message="main.classes.dir  = ${main.classes.dir}" />
+        <echo message="test.classes.dir  = ${test.classes.dir}" />
+        <echo message="project.build.dir = ${project.build.dir}" />
+        <echo message="project.dist.dir  = ${project.dist.dir}" />
+   </target>
 
 </project>
