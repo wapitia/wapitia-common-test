@@ -15,12 +15,11 @@
     <target name="all" depends="init,checkstyle,clean,build,dist,javadoc,zip.source" 
         description="Clean, Build and document all">
     </target>
-	
-	<target name="clean" depends="init">
-		<delete dir="${project.bin.dir}" />
-        <delete dir="${project.build.dir}" />
+    
+    <target name="clean" depends="init">
+        <delete dir="${project.bin.dir}" />
         <delete dir="${javadoc.dir}" />
-	</target>
+    </target>
     
     <target name="build" depends="init">
         <mkdir dir="${main.classes.dir}" />
@@ -28,32 +27,31 @@
             <classpath refid="project.main.class.path" />
         </javac>
         <mkdir dir="${test.classes.dir}" />
-    	<javac srcdir="${test.source.dir}" destdir="${test.classes.dir}" includeantruntime="false">
+        <javac srcdir="${test.source.dir}" destdir="${test.classes.dir}" includeantruntime="false">
             <classpath refid="project.test.class.path" />
-       	</javac>
+           </javac>
     </target>
-	
-	<target name="dist" depends="init,build,javadoc">
+    
+    <target name="dist" depends="init,build,javadoc">
         <mkdir dir="${project.dist.dir}" />
-		<jar destfile="${project.dist.dir}/${project.artifact.id}-${project.artifact.version}.jar" 
-			index="true" basedir="${main.classes.dir}" >
-		</jar>
+        <jar destfile="${project.dist.dir}/${project.artifact.id}-${project.artifact.version}.jar" 
+            index="true" basedir="${main.classes.dir}" >
+        </jar>
         <jar destfile="${project.dist.dir}/Test-${project.artifact.id}-${project.artifact.version}.jar" 
             index="true" basedir="${test.classes.dir}">
         </jar>
         <zip basedir="${main.source.dir}" destfile="${project.dist.dir}/sources.jar" />
         <zip basedir="${javadoc.dir}" destfile="${project.dist.dir}/javadoc.jar" />
-	</target>
-	
-	<target name="eclipse.project.files.to.repo" depends="init" 
-		  description="move eclipse project files to repo build directory">
-		<mkdir dir="${repo.project.base}/build/eclipse" />
-		<copy file="${project.dir}/.classpath" todir="${repo.project.base}/build/eclipse" />
+    </target>
+    
+    <target name="eclipse.project.files.to.repo" depends="init" 
+          description="move eclipse project files to repo build directory">
+        <mkdir dir="${repo.project.base}/build/eclipse" />
+        <copy file="${project.dir}/.classpath" todir="${repo.project.base}/build/eclipse" />
         <copy file="${project.dir}/.project" todir="${repo.project.base}/build/eclipse" />
-	</target>
-	
+    </target>
+    
     <target name="checkstyle" depends="init" description="checkstyle-6.17 on the source">
-        <!-- <mkdir dir="${project.build.dir}" /> -->
         <checkstyle config="${checkstyle.rules}">
           <fileset dir="${source.dir}" includes="**/*.java"/>
           <formatter type="plain" useFile="false" />
@@ -73,7 +71,7 @@
                    author="true"
                    version="true"
                    use="true"
-        	       overview="${javadoc.overview.files}" 
+                   overview="${javadoc.overview.files}" 
                    windowtitle="${project.name} API Documentation">
             <sourcepath path="${main.source.dir}" />
             <doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
@@ -97,42 +95,42 @@
             />
     </target>
 
-	<target name="test" depends="init,build">
-		<junit printsummary="yes" haltonfailure="yes">
-		  <classpath>
-		    <pathelement location="${main.classes.dir}"/>
+    <target name="test" depends="init,build">
+        <junit printsummary="yes" haltonfailure="yes">
+          <classpath>
+            <pathelement location="${main.classes.dir}"/>
             <pathelement location="${test.classes.dir}"/>
             <fileset dir="${cots.dir}">
               <include name="junit4/junit.jar"/>
               <include name="ant-junit4.jar"/>
             </fileset>
-		  </classpath>
+          </classpath>
 
-		  <formatter type="plain"/>
+          <formatter type="plain"/>
 
-		  <test name="${test.suite.class}" haltonfailure="no" outfile="result">
-		    <formatter type="plain" usefile="no" />
-		  </test>
+          <test name="${test.suite.class}" haltonfailure="no" outfile="result">
+            <formatter type="plain" usefile="no" />
+          </test>
 <!--
-		  <batchtest fork="yes" todir="${reports.tests}">
-		    <fileset dir="${src.tests}">
-		      <include name="**/*Test*.java"/>
-		      <exclude name="**/AllTests.java"/>
-		    </fileset>
-		  </batchtest>
-		  -->
-		</junit>
-	</target>
-		
+          <batchtest fork="yes" todir="${reports.tests}">
+            <fileset dir="${src.tests}">
+              <include name="**/*Test*.java"/>
+              <exclude name="**/AllTests.java"/>
+            </fileset>
+          </batchtest>
+          -->
+        </junit>
+    </target>
+        
     <target name="init">
         <tstamp />
         <property file="build.properties"  />
         <property name="workspace.dir" value="${env.HOME}/workspace" />
-    	<property name="company.name" value="Wapitia" />        
+        <property name="company.name" value="Wapitia" />        
         <property name="company.home.ref" value="wapitia.com" />        
         <property name="project.name" value="${ant.project.name}"/>
-		<property name="project.dir" value="${workspace.dir}/${project.name}" />
-    	<property name="project.artifact.id" value="${artifact.id}" />
+        <property name="project.dir" value="${workspace.dir}/${project.name}" />
+        <property name="project.artifact.id" value="${artifact.id}" />
         <property name="project.artifact.version" value="${artifact.version}" />
         <property name="eclipse.project.dir" value="${project.dir}" />
         <property name="common.project.dir" value="${env.HOME}/git/wapitia-common-test/wapitia-common-module" />
@@ -148,7 +146,6 @@
         <property name="project.bin.dir" value="${project.dir}/bin" />
         <property name="main.classes.dir" value="${project.bin.dir}/classes"/>
         <property name="test.classes.dir" value="${project.bin.dir}/testclasses"/>
-        <property name="project.build.dir" value="${project.dir}/build" />
         <property name="project.dist.dir" value="${project.dir}/dist" />
         <property name="zip.source.filepath" value="${project.dir}/${project.name}.${DSTAMP}.zip"/>
         <property name="module.source.dir" value="${source.dir}/module"/>
@@ -166,7 +163,6 @@
         <echo message="project.bin.dir   = ${project.bin.dir}" />
         <echo message="main.classes.dir  = ${main.classes.dir}" />
         <echo message="test.classes.dir  = ${test.classes.dir}" />
-        <echo message="project.build.dir = ${project.build.dir}" />
         <echo message="project.dist.dir  = ${project.dist.dir}" />
    </target>
 
