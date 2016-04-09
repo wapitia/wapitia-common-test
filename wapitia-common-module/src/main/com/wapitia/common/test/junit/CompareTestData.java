@@ -66,51 +66,81 @@ public class CompareTestData {
      * A hash-code comment line is one that starts with a hash character '#'
      * preceded by optional whitespace, and continuing to the end of the
      * string.
+     * @see Pattern#compile(String)
      */
     public static final String HASH_COMMENT_REGEX = "^\\s*#.*$";
 
     /**
+     * Predicate tests {@code true} when the String is
+     * not a {@link #HASH_COMMENT_REGEX comment}. This is used to
+     * filter out comment strings.
+     *
+     * @return a new Predicate that will filter out hash comment lines.
+     */
+    public static Predicate<String> noHashComments() {
+        final Pattern commentPattern = Pattern.compile(HASH_COMMENT_REGEX);
+        final Predicate<String> noComments =
+            ts -> ! commentPattern.matcher(ts).matches();
+        return noComments;
+    }
+
+    /**
+     * Predicate always tests {@code true} to be used as a pass-through
+     * filter.
+     */
+    public static Predicate<String> noFilter = ts -> true;
+
+    /**
      * Compare expected and actual lines of text.
-     * @param expected Expected lines of test data.
-     *                 Comment lines (those that begin with '#') shall be
-     *                 ignored.
+     * Comment lines (those that begin with '#') are ignored.
+     *
+     * @param expectedsResourceName Expected lines of test data,
+     *                              as a resource to load.
      * @param actuals Actual lines of test data.
+     *
+     * @see #assertEqual(Stream, Stream,
+     *          Comparator, Predicate, boolean)
+     */
+    public static void assertEqual(
+        final String expectedsResourceName,
+        final Stream<String> actuals)
+    {
+        final TextSource ts =
+            TextSource.fromResource(expectedsResourceName);
+        assertEqual(ts.toStream(), actuals, noHashComments());
+    }
+
+    /**
+     * Compare expected and actual lines of text.
+     * If the stream of strings mismatch then this will
+     * {@link org.junit.Assert#fail fail}.
+     * The {@code lineFilter} predicate is used to ignore certain lines in
+     * both streams such as comment lines. This must not be null:
+     * If all lines are to be compared (no filtering),
+     * then {@link #noFilter} should be used here.
+     *
+     * @param expected Expected lines of test data.
+     * @param actuals Actual lines of test data.
+     * @param lineFilter filter applied to both streams to ignore
+     *                   particular line types, such as comments.
      */
     public static void assertEqual(
         final Stream<String> expected,
-        final Stream<String> actuals)
+        final Stream<String> actuals,
+        final Predicate<String> lineFilter)
     {
-        Pattern commentPattern = Pattern.compile(HASH_COMMENT_REGEX);
-        Predicate<String> noComments =
-            s -> ! commentPattern.matcher(s).matches();
-        assertStrStreamsEqual(
-            expected.filter(noComments), actuals,
-            String::compareTo, false);
+        assertEqual(expected, actuals, String::compareTo,
+            lineFilter, false);
     }
 
     /**
-     * Compare expected and actual lines of text.
-     * @param resourceName Expected lines of test data.
-     *                 Comment lines (those that begin with '#') shall be
-     *                 ignored.
-     * @param actuals Actual lines of test data.
-     */
-    public static void assertEqual(
-        final String resourceName,
-        final Stream<String> actuals)
-    {
-        Pattern commentPattern = Pattern.compile(HASH_COMMENT_REGEX);
-        Predicate<String> noComments =
-            s -> ! commentPattern.matcher(s).matches();
-        TextSource ts = TextSource.fromResourceText(resourceName);
-        assertStrStreamsEqual(
-            ts.toStream().filter(noComments), actuals,
-            String::compareTo, false);
-    }
-
-    /**
-     * Compare expected Stream of Strings to some actual stream. The actual
+     * Compare expected Stream of Strings to some actual stream.
+     * The actual
      * stream must be at least as long as the expected stream.
+     * If the two streams of strings don't match then this will
+     * {@link org.junit.Assert#fail fail}.
+     *
+     * <p>None of these parameters may be null.
      *
      * @param <T> any comparable type.
      *
@@ -118,24 +148,27 @@ public class CompareTestData {
      *                     baseline of results
      * @param actualStr Actual Strings, must be at least as long as expected.
      * @param comp Comparator for equality.
+     * @param lineFilter filter applied to both streams to ignore
+     *                   particular line types, such as comments.
      * @param mustBeSameLength {@code true} if the expected stream must have
      *                         no extra lines beyond what the actuals provide.
      */
-    public static <T> void assertStrStreamsEqual(
+    public static <T> void assertEqual(
         final Stream<T> expectedStr,
         final Stream<T> actualStr,
         final Comparator<T> comp,
+        final Predicate<String> lineFilter,
         final boolean mustBeSameLength)
     {
-        Iterator<T> it1 = expectedStr.iterator();
-        Iterator<T> it2 = actualStr.iterator();
+        final Iterator<T> it1 = expectedStr.iterator();
+        final Iterator<T> it2 = actualStr.iterator();
         long line = 0L;
         while (it1.hasNext()) {
             ++line;
-            T s1 = it1.next();
+            final T s1 = it1.next();
 
             if (it2.hasNext()) {
-                T s2 = it2.next();
+                final T s2 = it2.next();
                 if (comp.compare(s1, s2) != 0) {
                     fail(format(ITEM_MISMATCH_STR, line, s1, s2));
                 }
@@ -146,10 +179,15 @@ public class CompareTestData {
             }
         }
         if (it2.hasNext() && mustBeSameLength) {
-            T s2 = it2.next();
+            final T s2 = it2.next();
             fail(format(TOO_LONG_STR, line, s2));
         }
     }
 
+    /**
+     * Constructor is private as this is a utility class.
+     */
+    private CompareTestData() {
+    }
 
 }
