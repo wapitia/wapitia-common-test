@@ -59,26 +59,28 @@ public interface TextSource {
     Stream<String> toStream();
 
     /**
-     * Builds and returns a {@code TestData} instance given some
-     * text stream resource.
+     * Builds and returns a {@code TextSource} instance given some
+     * text stream resource name.
      *
      * <p>The resource is located using the
-     * {@link java.lang.ClassLoader ClassLoader} of this {@code TestData}
+     * {@link java.lang.ClassLoader ClassLoader} of this {@code TextSource}
      * object.
      *
-     * @param resourceName the name of a resource, suitable for passing
-     *                     to {@link Class#getResourceAsStream(String)}
-     * @return A newly build TestData structure, built from the resource stream.
+     * @param resourceName the name of a resource, resolved to an i/o
+     *                     stream from a call to
+     *                     {@link Class#getResourceAsStream(String)}
+     * @return A newly build TextSource structure,
+     *         built from the resource stream.
      *
-     * @see #fromResourceText(String, Class)
+     * @see #fromResource(String, Class)
      */
-    public static TextSource fromResourceText(String resourceName) {
-        TextSource result = fromResourceText(resourceName, TextSource.class);
+    public static TextSource fromResource(String resourceName) {
+        TextSource result = fromResource(resourceName, TextSource.class);
         return result;
     }
 
     /**
-     * Builds a {@code TestData} instance given some text stream resource,
+     * Builds a {@code TextSource} instance given some text stream resource,
      * and some {@link java.lang.Class Class} reference specifying which
      * {@link java.lang.ClassLoader ClassLoader} to use to load the
      * resource.
@@ -87,9 +89,10 @@ public interface TextSource {
      *                     to {@link Class#getResourceAsStream(String)}
      * @param clss {@code Class} to use to load the text resource.
      *
-     * @return A newly build TestData structure, built from the resource stream.
+     * @return A newly build TextSource structure,
+     *         built from the resource stream.
      */
-    public static TextSource fromResourceText(
+    public static TextSource fromResource(
           String resourceName, Class<?> clss)
     {
         InputStream istream = clss.getResourceAsStream(resourceName);
