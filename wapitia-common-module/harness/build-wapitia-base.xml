@@ -133,7 +133,9 @@
         <property name="project.artifact.id" value="${artifact.id}" />
         <property name="project.artifact.version" value="${artifact.version}" />
         <property name="eclipse.project.dir" value="${project.dir}" />
-        <property name="common.project.dir" value="${env.HOME}/git/wapitia-common-test/wapitia-common-module" />
+        <property name="common.repo.project.dir" value="${env.HOME}/git/wapitia-common-test/wapitia-common-module" />
+        <property name="common.workspace.project.dir" value="${workspace.dir}/WapitiaCommonTest" />
+        <property name="common.test.jar" value="${common.workspace.project.dir}/dist/common-test-1.0.0.jar" />
         <property name="repo.project.base" value="${env.HOME}/git/${repo.base.name}"/>
         <property name="repo.module.base" value="${repo.project.base}/${module.name}"/>
         <property name="docs.dir" value="${repo.module.base}/docs"/>
@@ -141,7 +143,7 @@
         <property name="main.source.dir" value="${source.dir}/main"/>
         <property name="test.source.dir" value="${source.dir}/test"/>
         <property name="cots.dir" value="${env.COTS}" />
-        <property name="test.harness.dir" value="${common.project.dir}/harness" />
+        <property name="test.harness.dir" value="${common.repo.project.dir}/harness" />
         <property name="checkstyle.rules" value="${test.harness.dir}/wapitia-checkstyle.xml" />
         <property name="project.bin.dir" value="${project.dir}/bin" />
         <property name="main.classes.dir" value="${project.bin.dir}/classes"/>
@@ -164,6 +166,21 @@
         <echo message="main.classes.dir  = ${main.classes.dir}" />
         <echo message="test.classes.dir  = ${test.classes.dir}" />
         <echo message="project.dist.dir  = ${project.dist.dir}" />
+        
+        <path id="project.main.class.path">
+            <pathelement location="${common.test.jar}" />
+            <fileset dir="${cots.dir}">
+                <include name="junit4/junit.jar" />
+            </fileset>
+        </path>
+        <path id="project.test.class.path">
+            <pathelement location="${common.test.jar}" />
+            <pathelement location="${main.classes.dir}" />
+            <fileset dir="${cots.dir}">
+                <include name="junit4/junit.jar" />
+            </fileset>
+        </path>
+        
    </target>
 
 </project>

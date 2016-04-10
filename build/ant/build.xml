@@ -4,32 +4,14 @@
     |  Ant file to clean, build, distribute the WapitiaCommonTest project                                                      
     |  @author Corey Morgan                                                 
     + ====================================================================== -->
-<project name="WapitiaCommonTest" default="all" >
+<project name="WapitiaCommonTest" default="all">
     <description>
            Ant file to clean, build, distribute the WapitiaCommonTest project
     </description>
-	
-	<property environment="env"/>
-<!--	<import as="bbase"
-    	file="${env.HOME}/workspace/WapitiaCommonTest/harness/build-wapitia-base.xml" /> -->
-    <import as="bbase"
-        file="${env.HOME}/git/wapitia-common-test/wapitia-common-module/harness/build-wapitia-base.xml" />
+
+    <property environment="env" />
+    <import as="bbase" file="${env.HOME}/git/wapitia-common-test/wapitia-common-module/harness/build-wapitia-base.xml" />
 
     <target name="all" depends="bbase.all" />
-	
-    <target name="init" depends="bbase.init">
-       <path id="project.main.class.path">
-         <fileset dir="${cots.dir}">
-           <include name="junit4/junit.jar"/>
-         </fileset>
-       </path>
-       <path id="project.test.class.path">
-         <pathelement location="${main.classes.dir}"/>
-         <fileset dir="${cots.dir}">
-           <include name="junit4/junit.jar"/>
-         </fileset>
-       </path>
-<!--       <property name="test.suite.class" value="com.wapitia.test.common.test.TestWapitiaTestSuite" /> -->
-  	</target>
 
 </project>
